@@ -1,0 +1,10 @@
+cron:
+- description: scan UK edition
+  url: /jobs/edition/uk
+  schedule: every 2 minutes
+- description: scan AU edition
+  url: /jobs/edition/au
+  schedule: every 2 minutes
+- description: scan US edition
+  url: /jobs/edition/us
+  schedule: every 2 minutes
