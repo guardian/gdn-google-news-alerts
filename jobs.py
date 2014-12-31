@@ -37,6 +37,7 @@ class GoogleNewsScrape(webapp2.RequestHandler):
 
 class PostReporter(webapp2.RequestHandler):
 	def get(self):
+		headers.text(self.response)
 
 		new_urls_query = models.SeenUrl.query(models.SeenUrl.reported == False)
 
@@ -48,11 +49,12 @@ class PostReporter(webapp2.RequestHandler):
 			else:
 				new_urls[newly_seen.section] = [newly_seen.url]
 
+			newly_seen.reported = True
+			newly_seen.put()
 
-
-		data = {
-			"new_urls": new_urls
-		}
+		if not new_urls:
+			self.response.out.write("No new urls seen")
+			return
 
 		sender_address = configuration.lookup('SENDER_EMAIL')
 		recipients = configuration.lookup('GNEWS_ALERT_EMAILS').split(",")
@@ -70,7 +72,6 @@ class PostReporter(webapp2.RequestHandler):
 
 		mail.send_mail(sender_address, recipients, subject, body)
 
-		headers.text(self.response)
 		self.response.out.write(body)
 
 app = webapp2.WSGIApplication([
