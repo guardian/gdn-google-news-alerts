@@ -2,6 +2,7 @@ import webapp2
 import json
 import logging
 from urllib import quote, urlencode
+from urlparse import urlparse
 
 from google.appengine.api import urlfetch
 from google.appengine.api import mail
@@ -10,6 +11,7 @@ import headers
 import feed_reader
 import models
 import configuration
+import gae
 
 class GoogleNewsScrape(webapp2.RequestHandler):
 	def get(self, edition):
@@ -49,8 +51,9 @@ class PostReporter(webapp2.RequestHandler):
 			else:
 				new_urls[newly_seen.section] = [newly_seen.url]
 
-			newly_seen.reported = True
-			newly_seen.put()
+			if not gae.is_development():
+				newly_seen.reported = True
+				newly_seen.put()
 
 		if not new_urls:
 			self.response.out.write("No new urls seen")
@@ -64,9 +67,14 @@ class PostReporter(webapp2.RequestHandler):
 		body = ""
 
 		for section, urls in new_urls.items():
+
 			body = body + "Section: {0}\n\n".format(section)
 			for url in urls:
+				parsed_url = urlparse(url)
+
 				body = body + "{0}\n".format(url)
+				body = body + "Ophan: https://dashboard.ophan.co.uk/info?path={0}\n".format(parsed_url.path)
+				body = body + '\n'
 
 			body = body + "\n"
 
