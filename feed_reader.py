@@ -13,6 +13,6 @@ def extract_link(google_news_url):
 guardian_urls = [extract_link(e.link) for e in d.entries if 'theguardian.com' in e.link]
 
 def read_edition(edition):
-	edition_url = google_news_url.format(edition=edition, total=30)
+	edition_url = google_news_url.format(edition=edition, total=6)
 	feed_data = feedparser.parse(edition_url)
 	return [extract_link(e.link) for e in feed_data.entries if 'theguardian.com' in e.link]
