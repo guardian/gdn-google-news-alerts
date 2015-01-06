@@ -14,24 +14,32 @@ import configuration
 import gae
 
 class GoogleNewsScrape(webapp2.RequestHandler):
-	def get(self, edition):
+	def get(self, edition=None):
 
-		seen_links = feed_reader.read_edition(edition)
+		editions = []
+		data = []
 
-		new_links = []
+		if not edition:
+			editions = ['uk', 'us', 'au']
 
-		for link_url in seen_links:
-			link_record = models.SeenUrl.query(models.SeenUrl.url == link_url).fetch()
+		for current_edition in editions:
 
-			if not link_record:
-				new_link_record = models.SeenUrl(url=link_url, section=edition)
-				new_link_record.put()
-				new_links.append(link_url)
+			seen_links = feed_reader.read_edition(current_edition)
 
-		data = {
-			'edition': edition,
-			'seen_links': new_links,
-		}
+			new_links = []
+
+			for link_url in seen_links:
+				link_record = models.SeenUrl.query(models.SeenUrl.url == link_url).fetch()
+
+				if not link_record:
+					new_link_record = models.SeenUrl(url=link_url, section=current_edition)
+					new_link_record.put()
+					new_links.append(link_url)
+
+			data.append({
+				'edition': current_edition,
+				'seen_links': new_links,
+			})
 
 		headers.json(self.response)
 
@@ -83,6 +91,7 @@ class PostReporter(webapp2.RequestHandler):
 		self.response.out.write(body)
 
 app = webapp2.WSGIApplication([
+	('/jobs/scrape', GoogleNewsScrape),
 	('/jobs/edition/(\w+)', GoogleNewsScrape),
 	('/jobs/report', PostReporter),],
                               debug=True)

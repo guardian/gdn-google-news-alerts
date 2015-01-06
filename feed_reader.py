@@ -3,7 +3,7 @@ import feedparser
 from urlparse import urlparse, parse_qs
 
 
-google_news_url='http://news.google.com/news?ned={edition}&hl=en&output=rss&num={total}'
+google_news_url='http://news.google.com/news?ned={edition}&hl=en&output=atom&num={total}'
 
 d = feedparser.parse(google_news_url)
 
