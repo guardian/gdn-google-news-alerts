@@ -12,7 +12,15 @@ def extract_link(google_news_url):
 
 guardian_urls = [extract_link(e.link) for e in d.entries if 'theguardian.com' in e.link]
 
-def read_edition(edition, site_name='theguardian.com', max_entries=6):
-	edition_url = google_news_url.format(edition=edition, total=max_entries)
-	feed_data = feedparser.parse(edition_url)
+def create_rss_url(edition, topic, max_entries):
+	url = google_news_url.format(edition=edition, total=max_entries)
+
+	if topic:
+		url = url + "&topic={0}".format(topic)
+
+	return url
+
+def read_edition(edition, site_name='www.theguardian.com', max_entries=6, topic=None):
+	rss_url = create_rss_url(edition, topic, max_entries)
+	feed_data = feedparser.parse(rss_url)
 	return [extract_link(e.link) for e in feed_data.entries if site_name in e.link]
