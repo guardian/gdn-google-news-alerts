@@ -81,9 +81,9 @@ class PostReporter(webapp2.RequestHandler):
 
 		for newly_seen in new_urls_query:
 			if newly_seen.section in new_urls:
-				new_urls[newly_seen.section].append(newly_seen.url)
+				new_urls[newly_seen.section].append(newly_seen)
 			else:
-				new_urls[newly_seen.section] = [newly_seen.url]
+				new_urls[newly_seen.section] = [newly_seen]
 
 			if not gae.is_development():
 				newly_seen.reported = True
@@ -94,7 +94,7 @@ class PostReporter(webapp2.RequestHandler):
 			return
 
 		sender_address = configuration.lookup('SENDER_EMAIL')
-		recipients = configuration.lookup('GNEWS_ALERT_EMAILS').split(",")
+		recipients = configuration.lookup('GNEWS_ALERT_EMAILS', '').split(",")
 
 		subject = 'New Guardian stories spotted on Google News'
 
@@ -104,15 +104,19 @@ class PostReporter(webapp2.RequestHandler):
 
 			body = body + "Section: {0}\n\n".format(section)
 			for url in urls:
-				parsed_url = urlparse(url)
+				parsed_url = urlparse(url.url)
 
-				body = body + "{0}\n".format(url)
-				body = body + "Ophan: https://dashboard.ophan.co.uk/info?path={0}\n".format(parsed_url.path)
+				if url.headline:
+					body = body + "{0}\n".format(url.headline)
+
+				body = body + "{0}\n".format(url.url)
+				body = body + "Ophan: https://dashboard.ophan.co.uk/info?path={0}&referrer=google\n".format(parsed_url.path)
 				body = body + '\n'
 
 			body = body + "\n"
 
-		mail.send_mail(sender_address, recipients, subject, body)
+		if sender_address:
+			mail.send_mail(sender_address, recipients, subject, body)
 
 		self.response.out.write(body)
 
