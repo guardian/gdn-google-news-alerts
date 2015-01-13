@@ -8,7 +8,7 @@ from google.appengine.api import memcache
 
 import configuration
 
-CONTENT_API_HOST = 'content.guardianapis.com'
+CONTENT_API_HOST = configuration.lookup('CONTENT_API_HOST', 'content.guardianapis.com')
 CONTENT_API_KEY = configuration.lookup('CONTENT_API_KEY', 'gdn-google-news-alerts')
 
 def content_id(url):

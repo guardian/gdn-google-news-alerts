@@ -12,6 +12,26 @@ import feed_reader
 import models
 import configuration
 import gae
+import content_api
+
+def read_headline(link_url):
+	parsed_url = urlparse(link_url)
+
+	if 'www.theguardian.com' in parsed_url.hostname:
+		data = content_api.read(parsed_url.path, {'show-fields': 'headline'})
+		if not data:
+			return None
+
+		json_data = json.loads(data)
+
+		if 'response' in json_data:
+			if 'content' in json_data['response']:
+				if 'fields' in json_data['response']['content']:
+					if 'headline' in json_data['response']['content']['fields']:
+						return json_data['response']['content']['fields']['headline']
+
+		return None
+
 
 class GoogleNewsScrape(webapp2.RequestHandler):
 	def get(self, edition=None):
@@ -33,6 +53,12 @@ class GoogleNewsScrape(webapp2.RequestHandler):
 
 				if not link_record:
 					new_link_record = models.SeenUrl(url=link_url, section=current_edition)
+
+					headline = read_headline(link_url)
+
+					if headline:
+						new_link_record.headline = headline
+
 					new_link_record.put()
 					new_links.append(link_url)
 

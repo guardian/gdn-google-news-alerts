@@ -20,7 +20,7 @@ def create_rss_url(edition, topic, max_entries):
 
 	return url
 
-def read_edition(edition, site_name='www.theguardian.com', max_entries=6, topic=None):
+def read_edition(edition, site_name='www.theguardian.com', max_entries=30, topic=None):
 	rss_url = create_rss_url(edition, topic, max_entries)
 	feed_data = feedparser.parse(rss_url)
 	return [extract_link(e.link) for e in feed_data.entries if site_name in e.link]

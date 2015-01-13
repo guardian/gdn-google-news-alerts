@@ -9,6 +9,7 @@ class SeenUrl(ndb.Model):
 	section = ndb.StringProperty(required=True)
 	reported = ndb.BooleanProperty(default=False)
 	seen = ndb.DateTimeProperty(auto_now_add=True)
+	headline = ndb.StringProperty()
 
 class ScrapeJob(ndb.Model):
 	edition = ndb.StringProperty(required=True, default='uk')
