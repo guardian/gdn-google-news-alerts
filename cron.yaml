@@ -2,6 +2,3 @@ cron:
 - description: scrape Google News
   url: /jobs/scrape
   schedule: every 1 minutes
-- description: report new urls
-  url: /jobs/report
-  schedule: every 5 minutes

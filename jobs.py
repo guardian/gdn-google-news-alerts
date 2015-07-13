@@ -1,6 +1,8 @@
 import webapp2
 import json
 import logging
+import datetime
+
 from urllib import quote, urlencode
 from urlparse import urlparse
 
@@ -13,6 +15,9 @@ import models
 import configuration
 import gae
 import content_api
+
+def today():
+	return datetime.date.today().isoformat()
 
 def read_headline(link_url):
 	parsed_url = urlparse(link_url)
@@ -96,7 +101,7 @@ class PostReporter(webapp2.RequestHandler):
 		sender_address = configuration.lookup('SENDER_EMAIL')
 		recipients = configuration.lookup('GNEWS_ALERT_EMAILS', '').split(",")
 
-		subject = 'New Guardian stories spotted on Google News'
+		subject = 'New Guardian stories spotted on Google News: {0}'.format(today())
 
 		body = ""
 
